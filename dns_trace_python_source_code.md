@@ -22,16 +22,15 @@ When we run the above program, we get the following output ~
 ```  
 </br>
 
----------------------
 ## **我拆解研究一下**  
 
-1. 透過 [`dns.resolver.`query`()`](http://www.dnspython.org/docs/1.15.0/dns.resolver-pysrc.html#query) <sup>1</sup> 來找 IP addresses
+1. 透過 [`dns.resolver.query()`](http://www.dnspython.org/docs/1.15.0/dns.resolver-pysrc.html#query) <sup>1</sup> 來找 IP addresses
 
-1. 這裡的 `query` <sup>1</sup> 會 [`return get_default_resolver().`query`()`](http://www.dnspython.org/docs/1.15.0/dns.resolver-pysrc.html#Resolver.query) <sup>2</sup> 
+1. 這裡的 `query` <sup>1</sup> 會 [`return get_default_resolver().query()`](http://www.dnspython.org/docs/1.15.0/dns.resolver-pysrc.html#Resolver.query) <sup>2</sup> 
 
 1. 這裡的 `query` <sup>2</sup> 會 `return answer` ，且 `answer = Answer()` 
 
-1. 再往下尋找會找到 [`class `Answer`(object)`](http://www.dnspython.org/docs/1.15.0/dns.resolver-pysrc.html#Answer)
+1. 再往下尋找會找到 [`class Answer(object)`](http://www.dnspython.org/docs/1.15.0/dns.resolver-pysrc.html#Answer)
 
 1. 但是！ `class Answer(object)` 沒有定義 `__str__` ，所以 `print(result)` 出來的東西會是 *`object`* 所定義的 `__str__`，因為 `Answer` 繼承 `object` ，但... 這不是我們要的答案 QAQ
 
@@ -45,7 +44,7 @@ print(result)
 <dns.resolver.Answer object at 0x0329BD18>
 ```
 6. 不過！ `class Answer(object)` 有定義 `__iter__` ，所以可以透過 for loop 來 `iterate Answer`，相當於 `iterate Answer.rrset` <sup>3</sup> ， `print()` 出來的 [代碼和結果如上上上](#查詢DNS的代碼) ~  
->　**Class Answer 的註釋 <sup>3</sup>：**   
+> **Class Answer 的註釋 <sup>3</sup>：**   
 For convenience, the answer object implements much of the sequence protocol, forwarding to its **rrset**.  
 E.g. *" for a in answer "* is equivalent to *" for a in answer.rrset "*,
      *" answer [ i ] "* is equivalent to *" answer.rrset [ i ] "*, and 
@@ -56,7 +55,7 @@ E.g. *" for a in answer "* is equivalent to *" for a in answer.rrset "*,
 -------------------
 ### **再拆細一點**
 
-7. 在 `class Answer(object)` 中， [`def __iter__(self)`](http://www.dnspython.org/docs/1.15.0/dns.resolver-pysrc.html#Answer.__iter__) 會 [`return self.`rrset` and iter(self.`rrset`) or iter(tuple())`](http://www.dnspython.org/docs/1.15.0/dns.rrset-pysrc.html) 
+7. 在 `class Answer(object)` 中， [`def __iter__(self)`](http://www.dnspython.org/docs/1.15.0/dns.resolver-pysrc.html#Answer.__iter__) 會 [`return self.rrset and iter(self.rrset) or iter(tuple())`](http://www.dnspython.org/docs/1.15.0/dns.rrset-pysrc.html) 
 
 1. OK! 從這裡看到， for  loop `print()` 出來的是 `rrset` 
 
@@ -95,9 +94,9 @@ rdataset.Rdataset --+
 ---------------------------
 ### **再再再拆細一點吧 (⋟﹏⋞)**
 
-13. 在 `class RRset()` 中， `def __str__` 會 `return self.to_text()` ，而在 [`def `to_text`()`](http://www.dnspython.org/docs/1.15.0/dns.rrset-pysrc.html#RRset.to_text) 中可以看到他 `return` 時，會再加入 *`self.name`*
+13. 在 `class RRset()` 中， `def __str__` 會 `return self.to_text()` ，而在 [`def to_text()`](http://www.dnspython.org/docs/1.15.0/dns.rrset-pysrc.html#RRset.to_text) 中可以看到他 `return` 時，會再加入 *`self.name`*
 
-1. 而 `class Rdataset()` ，則在 [`return `to_text`(): `](http://www.dnspython.org/docs/1.15.0/dns.rdataset-pysrc.html#Rdataset.to_text)  時加入 *`self.ttl, dns.rdataclass.to_text(rdclass), dns.rdatatype.to_text(self.rdtype)`*
+1. 而 `class Rdataset()` ，則在 [`return to_text(): `](http://www.dnspython.org/docs/1.15.0/dns.rdataset-pysrc.html#Rdataset.to_text)  時加入 *`self.ttl, dns.rdataclass.to_text(rdclass), dns.rdatatype.to_text(self.rdtype)`*
 
 ```python
 class RRset(dns.rdataset.Rdataset):
@@ -126,8 +125,7 @@ google.com. 111 IN A 216.58.200.238
 ```
 </br>
 
----------------------------
-## **哦 ~ 所以簡單來說 ~~**  
+## **哦 ~ 所以簡單來說**  
 1. 因為 `Answer(object)` 沒有 override `__str__`  
    所以 `print(Answer())` 會印出 `object` 的 `__str__`  
 
