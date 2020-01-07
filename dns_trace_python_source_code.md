@@ -3,7 +3,7 @@
   
 ## **查詢 DNS 的代碼**  
 
-> 參考資料：https://www.tutorialspoint.com/python_network_programming/python_dns_look_up.htm  
+> 參考資料： https://www.tutorialspoint.com/python_network_programming/python_dns_look_up.htm  
 
 In the below program we find the ip address for the domain using the dns.resolver method. Usually this mapping between IP address and domain name is also known as 'A' record.  
 
@@ -43,7 +43,7 @@ print(result)
 # output
 <dns.resolver.Answer object at 0x0329BD18>
 ```
-6. 不過！ `class Answer(object)` 有定義 `__iter__` ，所以可以透過 for loop 來 `iterate Answer`，相當於 `iterate Answer.rrset` <sup>3</sup> ， `print()` 出來的 [代碼和結果如上上上](#查詢DNS的代碼) ~  
+6. 不過！ `class Answer(object)` 有定義 `__iter__` ，所以可以透過 for loop 來 `iterate Answer`，相當於 `iterate Answer.rrset` <sup>3</sup> ， `print()` 出來的 [代碼和結果如上上上](#查詢-dns-的代碼) ~  
 > **Class Answer 的註釋 <sup>3</sup>：**   
 For convenience, the answer object implements much of the sequence protocol, forwarding to its **rrset**.  
 E.g. *" for a in answer "* is equivalent to *" for a in answer.rrset "*,
@@ -52,7 +52,8 @@ E.g. *" for a in answer "* is equivalent to *" for a in answer.rrset "*,
 
 > 備註：大大說 iterate Answer 實際上可視為 iterate Answer 物件的 attribute-rrset，因為 class Answer 裡面有 rrset 這個變數 variables，所以 rrset 就是他的 attribute 之一...   懂嗎? 我是不懂啦 (╥﹏╥)
 
--------------------
+</br>
+
 ### **再拆細一點**
 
 7. 在 `class Answer(object)` 中， [`def __iter__(self)`](http://www.dnspython.org/docs/1.15.0/dns.resolver-pysrc.html#Answer.__iter__) 會 [`return self.rrset and iter(self.rrset) or iter(tuple())`](http://www.dnspython.org/docs/1.15.0/dns.rrset-pysrc.html) 
@@ -70,7 +71,9 @@ print(result.rrset)
 # output
 google.com. 111 IN A 216.58.200.238
 ```
----------------------
+
+</br>
+
 ### **再再拆細一點**
 
 10. 可以發現 [`rrset`](http://www.dnspython.org/docs/1.15.0/dns.rrset-module.html) 來自 [`class RRset()`](http://www.dnspython.org/docs/1.15.0/dns.rrset.RRset-class.html) ，而 [`RRset`](http://www.dnspython.org/docs/1.15.0/dns.rrset.RRset-class.html) 繼承 [`Rdataset`](http://www.dnspython.org/docs/1.15.0/dns.rdataset.Rdataset-class.html) ， [`Rdataset`](http://www.dnspython.org/docs/1.15.0/dns.rdataset.Rdataset-class.html) 繼承 [`Set`](http://www.dnspython.org/docs/1.15.0/dns.set.Set-class.html) ，如下圖~
@@ -88,10 +91,10 @@ rdataset.Rdataset --+
 
 12. 然後！！！ 通過各種繼承， `rrset` 因此是一個 **list** 的資料型態！！！  而要把 list 裡面的 element 走過一遍並印出來，就需要使用 **迴圈**，所以才用 for loop `print()` 出來
 
-> 備註：但... 為啥 for loop 印出來的時候，只剩下 IP addresses `( 216.58.200.238 )` ??   
-  　　　其他東西 `( google.com. 111 IN A )` 去哪了 ??
+> 備註：但... 為啥 for loop 印出來的時候，只剩下 IP addresses `( 216.58.200.238 )` ?? 其他東西 `( google.com. 111 IN A )` 去哪了 ??
 
----------------------------
+</br>
+
 ### **再再再拆細一點吧 (⋟﹏⋞)**
 
 13. 在 `class RRset()` 中， `def __str__` 會 `return self.to_text()` ，而在 [`def to_text()`](http://www.dnspython.org/docs/1.15.0/dns.rrset-pysrc.html#RRset.to_text) 中可以看到他 `return` 時，會再加入 *`self.name`*
@@ -147,7 +150,8 @@ google.com. 111 IN A 216.58.200.238
   　　　list of what ??  
   　　　從哪兒知道他會把 IP addresses 塞進去呀 ???　 ˚‧º·(˚ ˃̣̣̥⌓˂̣̣̥ )‧º·˚
 
------------
+</br>
+
 ### **回頭檢查一下** QAQ
 
 - 在 `class Set()` 我沒找到喵 Orz
