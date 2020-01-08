@@ -12,8 +12,8 @@ import dns.resolver
 
 domain = 'google.com'
 result = dns.resolver.query(domain, 'A')
-for ipval in result.rrset:
-    print(ipval.to_text())
+for ipval in result:
+    print(ipval)
 ```
 When we run the above program, we get the following output ~  
 
