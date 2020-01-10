@@ -53,3 +53,8 @@ print(ipval_cnt)
 
 1. 而 `Set()` 在 `__init__` 有 assign `self.items = []`   
    表示 items 的資料型態是 list，所以才需要使用 **迴圈**，用 for loop `print()` 出來
+
+</br>
+
+### 其他筆記：[DNS Messages Format](./dns_message_format.md)
+![DNS message packet](./DNS%20message%20format.png)
